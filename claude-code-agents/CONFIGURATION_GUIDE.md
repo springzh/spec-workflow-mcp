@@ -26,7 +26,68 @@ cp claude-code-agents/design-architect.md ~/.config/claude-code/agents/
 cp claude-code-agents/implementation-task.md ~/.config/claude-code/agents/
 ```
 
-### 2. Configure Claude Code
+### 2. Copy Template Files (Optional but Recommended)
+
+The templates are used by the agents to generate consistent documents. You have two options:
+
+#### Option A: Copy to Claude Code Configuration (Global)
+```bash
+# Create templates directory in Claude Code config
+mkdir -p ~/.config/claude-code/templates
+
+# Copy all templates
+cp -r claude-code-agents/templates/* ~/.config/claude-code/templates/
+
+# This creates:
+# ~/.config/claude-code/templates/requirements/template.md
+# ~/.config/claude-code/templates/design/template.md
+# ~/.config/claude-code/templates/tasks/template.md
+# ~/.config/claude-code/templates/product/template.md
+# ~/.config/claude-code/templates/tech/template.md
+# ~/.config/claude-code/templates/structure/template.md
+```
+
+#### Option B: Copy to Project Directory (Project-Specific)
+```bash
+# Navigate to your project directory
+cd /path/to/your/project
+
+# Create .spec-workflow directory structure
+mkdir -p .spec-workflow/templates
+
+# Copy templates to project
+cp -r claude-code-agents/templates/* .spec-workflow/templates/
+
+# This creates:
+# .spec-workflow/templates/requirements/template.md
+# .spec-workflow/templates/design/template.md
+# .spec-workflow/templates/tasks/template.md
+# .spec-workflow/templates/product/template.md
+# .spec-workflow/templates/tech/template.md
+# .spec-workflow/templates/structure/template.md
+```
+
+### 3. Copy Steering Files (Optional but Recommended)
+
+Steering files provide project context for the agents. Copy them to your project:
+
+```bash
+# Navigate to your project directory
+cd /path/to/your/project
+
+# Create steering directory
+mkdir -p .spec-workflow/steering
+
+# Copy steering documents
+cp claude-code-agents/steering/* .spec-workflow/steering/
+
+# This creates:
+# .spec-workflow/steering/product.md
+# .spec-workflow/steering/tech.md
+# .spec-workflow/steering/structure.md
+```
+
+### 4. Configure Claude Code
 
 Add the agents to your Claude Code configuration:
 
@@ -36,14 +97,14 @@ Add the agents to your Claude Code configuration:
     "requirements-specialist": {
       "enabled": true,
       "config": {
-        "templatePath": "~/.config/claude-code/templates/requirements",
+        "templatePath": "~/.config/claude-code/templates",
         "steeringDocumentPath": ".spec-workflow/steering"
       }
     },
     "design-architect": {
       "enabled": true,
       "config": {
-        "templatePath": "~/.config/claude-code/templates/design",
+        "templatePath": "~/.config/claude-code/templates",
         "codeAnalysisDepth": "deep"
       }
     },
@@ -58,7 +119,154 @@ Add the agents to your Claude Code configuration:
 }
 ```
 
-### 3. Basic Usage
+## File Organization Options
+
+### Global vs Project-Specific Setup
+
+#### Global Setup (Recommended for Multiple Projects)
+- **Templates**: Stored in `~/.config/claude-code/templates/`
+- **Agents**: Stored in `~/.config/claude-code/agents/`
+- **Benefits**: Share templates across all projects
+- **Best for**: Developers working on multiple similar projects
+
+#### Project-Specific Setup (Recommended for Project-Specific Needs)
+- **Templates**: Stored in `.spec-workflow/templates/`
+- **Steering**: Stored in `.spec-workflow/steering/`
+- **Benefits**: Custom templates per project
+- **Best for**: Projects with unique requirements or team standards
+
+### Complete Directory Structure
+
+After following the setup instructions, your directories will look like:
+
+#### Claude Code Configuration (Global)
+```
+~/.config/claude-code/
+├── agents/
+│   ├── requirements-specialist.md
+│   ├── design-architect.md
+│   └── implementation-task.md
+└── templates/
+    ├── requirements/
+    │   └── template.md
+    ├── design/
+    │   └── template.md
+    ├── tasks/
+    │   └── template.md
+    ├── product/
+    │   └── template.md
+    ├── tech/
+    │   └── template.md
+    └── structure/
+        └── template.md
+```
+
+#### Project Directory (Project-Specific)
+```
+your-project/
+├── .spec-workflow/
+│   ├── templates/
+│   │   ├── requirements/
+│   │   │   └── template.md
+│   │   ├── design/
+│   │   │   └── template.md
+│   │   ├── tasks/
+│   │   │   └── template.md
+│   │   ├── product/
+│   │   │   └── template.md
+│   │   ├── tech/
+│   │   │   └── template.md
+│   │   └── structure/
+│   │       └── template.md
+│   ├── steering/
+│   │   ├── product.md
+│   │   ├── tech.md
+│   │   └── structure.md
+│   └── specs/
+│       └── {feature-name}/
+│           ├── requirements.md
+│           ├── design.md
+│           └── tasks.md
+└── [your existing project files]
+```
+
+## Configuration Path Resolution
+
+The agents will look for templates and steering files in this order:
+
+1. **Project-specific paths** (if available):
+   - Templates: `.spec-workflow/templates/{type}/template.md`
+   - Steering: `.spec-workflow/steering/{document}.md`
+
+2. **Global paths** (fallback):
+   - Templates: `~/.config/claude-code/templates/{type}/template.md`
+   - Steering: `.spec-workflow/steering/{document}.md`
+
+3. **Built-in defaults** (if no templates found):
+   - Agents will use built-in template structures
+
+## Customizing Templates and Steering Files
+
+### Customizing Templates
+```bash
+# Edit a specific template
+nano ~/.config/claude-code/templates/requirements/template.md
+
+# Or edit project-specific template
+nano .spec-workflow/templates/requirements/template.md
+```
+
+### Customizing Steering Files
+```bash
+# Edit project steering documents
+nano .spec-workflow/steering/product.md
+nano .spec-workflow/steering/tech.md
+nano .spec-workflow/steering/structure.md
+```
+
+### Template Customization Tips
+- Keep the overall structure intact
+- Modify placeholders and examples to match your project
+- Add project-specific sections as needed
+- Maintain consistency across templates
+
+## Troubleshooting File Setup
+
+### Common Issues
+
+1. **Template Not Found**
+   ```bash
+   # Check if templates exist in expected location
+   ls -la ~/.config/claude-code/templates/requirements/
+   ls -la .spec-workflow/templates/requirements/
+   ```
+
+2. **Steering Document Not Found**
+   ```bash
+   # Check steering directory structure
+   ls -la .spec-workflow/steering/
+   ```
+
+3. **Permission Issues**
+   ```bash
+   # Fix permissions
+   chmod 755 ~/.config/claude-code/templates/
+   chmod 755 .spec-workflow/
+   ```
+
+### Verification Commands
+```bash
+# Verify agent files are in place
+ls -la ~/.config/claude-code/agents/
+
+# Verify template structure
+find ~/.config/claude-code/templates/ -name "template.md"
+
+# Verify project structure
+find .spec-workflow/ -name "*.md"
+```
+
+## Basic Usage
 
 ```bash
 # Create requirements for a new feature
